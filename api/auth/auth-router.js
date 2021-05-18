@@ -29,20 +29,19 @@ router.post("/login", checkUsernameExists, (req, res, next) => {
   }
 });
 
-/**
-  3 [GET] /api/auth/logout
-
-  response for logged-in users:
-  status 200
-  {
-    "message": "logged out"
+router.get("/logout", (req, res, next) => {
+  if (req.session.user) {
+    req.session.destroy((err) => {
+      err
+        ? next({
+            message:
+              "You can check out anytime you like... so please try logging out again",
+          })
+        : res.status(200).json("logged out");
+    });
+  } else {
+    res.status(200).json("no session");
   }
-
-  response for not-logged-in users:
-  status 200
-  {
-    "message": "no session"
-  }
- */
+});
 
 module.exports = router;
