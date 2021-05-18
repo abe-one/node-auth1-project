@@ -8,7 +8,11 @@ const Users = require("../users/users-model");
     "message": "You shall not pass!"
   }
 */
-function restricted() {}
+function restricted(req, res, next) {
+  req.session.user
+    ? next()
+    : res.status(401).json({ message: "You shall not pass!" });
+}
 
 async function checkUsernameFree(req, res, next) {
   const username = { username: req.body.username };
@@ -50,8 +54,6 @@ function checkPasswordLength(req, res, next) {
     res.status(422).json({ message: "Password must be longer than 3 chars" });
   }
 }
-
-// Don't forget to add these to the `exports` object so they can be required in other modules
 
 module.exports = {
   restricted,
