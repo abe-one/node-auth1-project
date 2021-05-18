@@ -1,17 +1,19 @@
 const db = require("../../data/db-config");
 
 function find() {
-  db("users");
+  return db.select("user_id", "username").from("users");
 }
 
 function findBy(filter) {
-  db("users").where(filter);
+  return db.select("user_id", "username").from("users").where(filter);
 }
 
-async function findById(user_id) {
-  const user = await db("users").where({ user_id }).first();
-  delete user.password;
-  return user;
+function findById(user_id) {
+  return db
+    .select("user_id", "username")
+    .from("users")
+    .where({ user_id })
+    .first();
 }
 
 async function add(user) {
