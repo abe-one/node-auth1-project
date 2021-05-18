@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const bcrypt = require("bcryptjs");
 const {
   checkUsernameFree,
   checkUsernameExists,
@@ -19,21 +20,14 @@ router.post(
   }
 );
 
-/**
-  2 [POST] /api/auth/login { "username": "sue", "password": "1234" }
-
-  response:
-  status 200
-  {
-    "message": "Welcome sue!"
+router.post("/login", checkUsernameExists, (req, res, next) => {
+  if (bcrypt.compareSync(req.body.password)) {
+    req.session.user = req.user;
+    res.status(200).json(`Welcome ${req.user.username}`);
+  } else {
+    next({ status: 401, message: "Invalid credentials" });
   }
-
-  response on invalid credentials:
-  status 401
-  {
-    "message": "Invalid credentials"
-  }
- */
+});
 
 /**
   3 [GET] /api/auth/logout
