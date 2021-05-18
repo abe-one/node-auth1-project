@@ -25,7 +25,7 @@ router.post(
 );
 
 router.post("/login", checkUsernameExists, (req, res, next) => {
-  if (bcrypt.compareSync(req.body.password)) {
+  if (bcrypt.compareSync(req.body.password, req.user.password)) {
     req.session.user = req.user;
     res.status(200).json(`Welcome ${req.user.username}`);
   } else {
