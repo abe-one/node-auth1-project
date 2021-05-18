@@ -2,6 +2,7 @@ const express = require("express");
 const helmet = require("helmet");
 const cors = require("cors");
 const session = require("express-session");
+// const KnexSessionStore = require("connect-session-knex");
 
 const server = express();
 const usersRouter = require("./users/users-router");
@@ -30,6 +31,13 @@ const sessionConfig = {
   },
   rolling: true,
   saveUninitialized: false,
+  // store: new KnexSessionStore({
+  //   knex: require("../data/db-config"),
+  //   tablename: "sessions",
+  //   sidfieldname: "session_id",
+  //   createtable: true,
+  //   clearInterval: 1000 * 60 * 60, //1000ms*60secs*60mins
+  // }),
 };
 
 server.use(session(sessionConfig));
