@@ -12,7 +12,11 @@ router.post(
   checkUsernameFree,
   checkPasswordLength,
   (req, res, next) => {
-    Users.add(req.body)
+    const { username, password } = req.body;
+
+    const hash = bcrypt.hashSync(password, process.env.HASHFACTOR || 8);
+
+    Users.add({ username, password: hash })
       .then((newUser) => {
         res.status(200).json(newUser);
       })
