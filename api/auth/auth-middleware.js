@@ -1,49 +1,57 @@
-/*
-  If the user does not have a session saved in the server
+const Users = require("../users/users-model");
 
-  status 401
-  {
-    "message": "You shall not pass!"
-  }
-*/
-function restricted() {
-
+function restricted(req, _res, next) {
+  req.session.user
+    ? next()
+    : next({ status: 401, message: "You shall not pass!" });
 }
 
-/*
-  If the username in req.body already exists in the database
+async function checkUsernameFree(req, _res, next) {
+  const { username } = req.body;
 
-  status 422
-  {
-    "message": "Username taken"
+  try {
+    const [user] = await Users.findBy({ username });
+
+    if (user?.username) {
+      next({ status: 422, message: "Username taken" });
+    } else {
+      req.user = user;
+      next();
+    }
+  } catch (err) {
+    next({ message: err.message, status: err.status });
   }
-*/
-function checkUsernameFree() {
-
 }
 
-/*
-  If the username in req.body does NOT exist in the database
+async function checkUsernameExists(req, _res, next) {
+  const { username } = req.body;
 
-  status 401
-  {
-    "message": "Invalid credentials"
+  try {
+    const [user] = await Users.findBy({ username });
+
+    if (!user?.username) {
+      next({ status: 401, message: "Invalid credentials" });
+    } else {
+      req.user = user;
+      next();
+    }
+  } catch (err) {
+    next({ message: err.message, status: err.status });
   }
-*/
-function checkUsernameExists() {
-
 }
 
-/*
-  If password is missing from req.body, or if it's 3 chars or shorter
-
-  status 422
-  {
-    "message": "Password must be longer than 3 chars"
+function checkPasswordLength(req, _res, next) {
+  const password = req.body.password;
+  if (password && password.length > 3) {
+    next();
+  } else {
+    next({ status: 422, message: "Password must be longer than 3 chars" });
   }
-*/
-function checkPasswordLength() {
-
 }
 
-// Don't forget to add these to the `exports` object so they can be required in other modules
+module.exports = {
+  restricted,
+  checkUsernameFree,
+  checkUsernameExists,
+  checkPasswordLength,
+};
